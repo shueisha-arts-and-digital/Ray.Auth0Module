@@ -110,20 +110,21 @@ flowchart LR
 
 ## 4. ドキュメント
 
-- [ ] 4-1. README の Usage を 9.x の書き方に直します。
+- [x] 4-1. README の Usage を 9.x の書き方に直します。
   - `users()->create([...])` を `users->create(new CreateUserRequestContent([...]))` にします。
   - 現在のサンプルは PHP の構文としても壊れているため、あわせて直します。
   - `use` 文を D1 の型で示します。
-- [ ] 4-2. README に設定の説明を追記します。
+- [x] 4-2. README に設定の説明を追記します。
   - `domain` の書式（D2）
   - `tokenCache`（D3）
   - Management に `audience` が使われないこと
-- [ ] 4-3. 5.x から 6.0.0 への移行手順を書きます（README またはリリースノート）。
+- [x] 4-3. 5.x から 6.0.0 への移行手順を書きます（README またはリリースノート）。
   - 型宣言の変更
   - Management API 呼び出しの書き換え（Issue #18 の対応表を流用します）
   - 無視されるようになった config キー
   - 例外の型の変化
   - D4 のスコープ変更
+  - → README の「Upgrading from 5.x to 6.0.0」に書きました。リリースノートはこの節へのリンクで済ませる想定です。
 
 ## 5. 検証
 
