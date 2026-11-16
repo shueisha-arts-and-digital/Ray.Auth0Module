@@ -8,6 +8,7 @@ use Auth0\SDK\API\Management\Management;
 use Auth0\SDK\API\Management\Wrapper\ManagementClient;
 use Auth0\SDK\API\Management\Wrapper\ManagementClientOptions;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Http\Client\ClientInterface;
 use Ray\Auth0Module\Annotation\Auth0Config;
 use Ray\Auth0Module\Exception\InvalidConfiguration;
 use Ray\Di\ProviderInterface;
@@ -42,10 +43,21 @@ class ManagementClientProvider implements ProviderInterface
             domain: $this->domain,
             clientId: $this->clientId,
             clientSecret: $this->clientSecret,
+            httpClient: $this->httpClient(),
             tokenCache: $this->tokenCache,
         ));
 
         return $client->getManagement();
+    }
+
+    /**
+     * Management API とトークン取得に使う PSR-18 クライアント
+     *
+     * null の場合は SDK が自動検出したクライアントを使う。テストで要求を捕捉するための差し替え口。
+     */
+    protected function httpClient() : ?ClientInterface
+    {
+        return null;
     }
 
     /**

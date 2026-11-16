@@ -80,26 +80,33 @@ flowchart LR
 
 ## 3. テスト
 
-- [ ] 3-1. `tests/Fake/Provider/FakeManagementClientProvider.php` の扱いを決めます。
+- [x] 3-1. `tests/Fake/Provider/FakeManagementClientProvider.php` の扱いを決めます。
   - 現状は本物の Provider の複製です。
   - 9.x では生成時に通信が発生しないため、廃止して本物の Provider を使う案が有力です。
-- [ ] 3-2. `tests/Auth0ModuleTest.php` を更新します。
+  - → 廃止しました。`Auth0ModuleTest` は本物の `Auth0Module` をそのまま使います。
+- [x] 3-2. `tests/Auth0ModuleTest.php` を更新します。
   - `use` 文と `assertInstanceOf` の型を D1 の型に合わせます。
   - 3-1 で Fake を廃止する場合、Fake への束縛を外します。
-- [ ] 3-3. `ManagementClientProvider` の単体テストを追加します。
+- [x] 3-3. `ManagementClientProvider` の単体テストを追加します。
   - 返り値が D1 の型であること。
   - スキーム付きの `domain` でも、要求先が `https://{host}/oauth/token` と `https://{host}/api/v2/...` になること。
   - トークン要求の `audience` が `https://{host}/api/v2/` であり、config の `audience` ではないこと。
   - `clientId` / `clientSecret` が欠けている場合に例外になること。
   - 検証方法は、PSR-18 のモッククライアントで要求を捕捉する形を想定しています。
     Provider にテスト用の `httpClient` を渡す経路が必要になるため、実装時に設計を決めます。
-- [ ] 3-4. D3 で含める場合、`tokenCache` のテストを追加します。
+  - → `ManagementClientProvider` に `protected function httpClient() : ?ClientInterface`（既定は null）を設け、テストでは派生クラス `SpyManagementClientProvider` が `FakeHttpClient` を返します。config のキーは増やしていません。
+  - テストは `tests/Provider/ManagementClientProviderTest.php` です。
+- [x] 3-4. D3 で含める場合、`tokenCache` のテストを追加します。
   - キャッシュにトークンがあるとき、トークン要求が出ないこと。
-- [ ] 3-5. D4 で採る場合、同じインスタンスが返ることをテストします。
-- [ ] 3-6. `Auth` と `Authentication` が 9.x でも生成できることを確認します（既存テストで足りるかを確認します）。
-- [ ] 3-7. `composer tests`（phpcs / phpunit / phpstan）をすべて通します。
-- [ ] 3-8. `vendor/bin/php-cs-fixer fix --dry-run --diff` を通します。
+  - → 取得したトークンがキャッシュに保存されることもあわせて確認しています（PSR-6 のテスト用実装 `tests/Fake/Cache/ArrayCachePool.php` を追加しました）。
+- [x] 3-5. D4 で採る場合、同じインスタンスが返ることをテストします。
+  - → `Auth0ModuleTest::testManagementIsSingleton` です。
+- [x] 3-6. `Auth` と `Authentication` が 9.x でも生成できることを確認します（既存テストで足りるかを確認します）。
+  - → 既存の `AuthTest` に加え、`Auth0ModuleTest` で `AuthInterface` / `Authentication` の生成と、`tokenCache` を含む config での生成を確認しています。
+- [x] 3-7. `composer tests`（phpcs / phpunit / phpstan）をすべて通します。
+- [x] 3-8. `vendor/bin/php-cs-fixer fix --dry-run --diff` を通します。
   - CI では実行されますが、`composer tests` には含まれていません。
+  - 2026-11-16: phpunit 24 件すべて成功、phpstan エラーなし、phpcs 通過、php-cs-fixer の指摘 0 件（PHP 8.2.30）。
 
 ## 4. ドキュメント
 
