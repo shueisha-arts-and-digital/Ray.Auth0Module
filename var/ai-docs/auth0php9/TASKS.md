@@ -128,7 +128,9 @@ flowchart LR
 
 ## 5. 検証
 
-- [ ] 5-1. CI が PHP 8.2 / 8.3 / 8.4 で通ることを確認します。
+- [x] 5-1. CI が PHP 8.2 / 8.3 / 8.4 で通ることを確認します。
+  - 2026-11-16: push 前の事前確認として、手元（8.2.30）と Docker（8.3.36 / 8.4.27）で CI と同じチェックを実行し、すべて通りました（phpunit 24 件成功、phpstan・phpcs エラーなし、php-cs-fixer 指摘 0 件、auth0/auth0-php 9.6.0）。
+  - 2026-11-16: push 後の GitHub Actions（`374d7ba`、run 43792834856）で、8.2 / 8.3 / 8.4 のジョブがすべて成功しました。
 - [ ] 5-2. 実テナントに対して、Management API を 1 回以上呼び出します（例: `users->list()`）。
 - [ ] 5-3. 実テナントで、アクセストークンの検証（`Auth::verifyToken()`）が通ることを確認します。
 - [ ] 5-4. 利用側の 1 媒体で、`composer require ray/auth0-module:dev-<ブランチ>` による組み込みを試します。
