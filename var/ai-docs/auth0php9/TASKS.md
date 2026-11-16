@@ -39,12 +39,18 @@ flowchart LR
 ## 1. 依存の更新
 
 - [x] 1-1. master から作業ブランチを作ります（`feature/auth0-php-9`）。
-- [ ] 1-2. `composer.json` の `auth0/auth0-php` を `^9.0` にします。
-- [ ] 1-3. D3 で含める場合、`psr/cache` を `require` に追加します。
-- [ ] 1-4. `composer update` を実行し、依存が解決できることを確認します。
+- [x] 1-2. `composer.json` の `auth0/auth0-php` を `^9.0` にします。
+- [x] 1-3. D3 で含める場合、`psr/cache` を `require` に追加します。
+- [x] 1-4. `composer update` を実行し、依存が解決できることを確認します。
   - PHP 8.3 での dry-run では解決できています。
-- [ ] 1-5. この時点で `composer tests` を実行し、壊れる箇所を記録します。
+  - 2026-11-16 に PHP 8.2.30 で実行し、解決できました（auth0/auth0-php 9.6.0、psr/cache 3.0.0）。
+- [x] 1-5. この時点で `composer tests` を実行し、壊れる箇所を記録します。
   - `ManagementClientProvider` と `FakeManagementClientProvider` が壊れる見込みです。
+  - 2026-11-16 の実行結果は次のとおりです。
+    - phpcs: 通過しました。
+    - phpunit: 6 件中 1 件がエラーになりました（`Auth0ModuleTest::testModule`）。`FakeManagementClientProvider.php:35` で `Management::__construct()` の第 1 引数（`string $token`）に `SdkConfiguration` を渡しているため、TypeError になります。
+    - phpstan: 2 件のエラーが出ました（`argument.type`）。`src/Provider/ManagementClientProvider.php:35` と `tests/Fake/Provider/FakeManagementClientProvider.php:35` で、どちらも上記と同じ原因です。
+    - 壊れた箇所は見込みどおり 2 つだけでした。
 
 ## 2. 実装
 
