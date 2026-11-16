@@ -54,23 +54,27 @@ flowchart LR
 
 ## 2. 実装
 
-- [ ] 2-1. `src/Provider/ManagementClientProvider.php` を作り直します。
+- [x] 2-1. `src/Provider/ManagementClientProvider.php` を作り直します。
   - `ManagementClient(new ManagementClientOptions(...))` を名前付き引数で生成します。
   - `getManagement()` の戻り値を返します。
   - config の `audience` と `customDomain` は渡しません。
   - `SdkConfiguration` と `strategy` の上書きを削除します。
   - `@implements ProviderInterface<...>` と戻り値の型を、D1 の型に合わせます。
-- [ ] 2-2. `domain` の正規化を実装します（D2）。
+- [x] 2-2. `domain` の正規化を実装します（D2）。
   - スキーム付き、スキームなし、末尾スラッシュ付きのいずれもホスト名にします。
   - 空文字やホスト名を取り出せない値は、生成時に例外にします。
-- [ ] 2-3. config の `domain` / `clientId` / `clientSecret` の型を検証します。
+- [x] 2-3. config の `domain` / `clientId` / `clientSecret` の型を検証します。
   - config は `array<string, mixed>` なので、PHPStan level max を通すために文字列であることを確かめます。
   - 欠けている場合の例外の型とメッセージを決めます。
-- [ ] 2-4. `tokenCache` を config から受け取れるようにします（D3）。
+  - → `Ray\Auth0Module\Exception\InvalidConfiguration`（`\InvalidArgumentException` を継承）を新設しました。空文字も不正として扱います。
+- [x] 2-4. `tokenCache` を config から受け取れるようにします（D3）。
   - `CacheItemPoolInterface` 以外が渡された場合は例外にします。
   - `Auth` と `AuthenticationClientProvider` に渡る config に `tokenCache` が混ざっても問題がないかを確認します。
     `SdkConfiguration` が未知のキーをどう扱うかを確かめ、必要なら渡す前に取り除きます。
-- [ ] 2-5. `src/Auth0Module.php` の束縛を変更します。
+  - 確認結果（2026-11-16）: `SdkConfiguration` は未知のキーを読み飛ばします。ただし `tokenCache` は未知のキーではなく、`SdkConfiguration` 自身のプロパティです（JWKS のキャッシュ用）。
+    そのため config に `tokenCache` を渡すと、`Auth::verifyToken()` の JWKS も同じプールにキャッシュされます。
+    → 取り除かず両方に渡すことにしました（キーが衝突せず、JWKS もキャッシュできるため）。README（4-2）に明記します。
+- [x] 2-5. `src/Auth0Module.php` の束縛を変更します。
   - `use` 文を D1 の型に差し替えます。
   - D4 で採る場合、`->in(Scope::SINGLETON)` を付けます。
 

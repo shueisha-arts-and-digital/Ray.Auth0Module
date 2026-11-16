@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ray\Auth0Module;
 
 use Auth0\SDK\API\Authentication;
-use Auth0\SDK\API\Management;
+use Auth0\SDK\API\Management\Management;
 use Ray\AuraWebModule\AuraWebModule;
 use Ray\Auth0Module\Annotation\Auth0Config;
 use Ray\Auth0Module\Annotation\Extractors;
@@ -42,7 +42,7 @@ class Auth0Module extends AbstractModule
             new AuthorizationHeaderTokenExtractor()
         ]);
         $this->bind(TokenExtractorResolver::class)->in(Scope::SINGLETON);
-        $this->bind(Management::class)->toProvider(ManagementClientProvider::class);
+        $this->bind(Management::class)->toProvider(ManagementClientProvider::class)->in(Scope::SINGLETON);
         $this->bind(Authentication::class)->toProvider(AuthenticationClientProvider::class);
     }
 }
