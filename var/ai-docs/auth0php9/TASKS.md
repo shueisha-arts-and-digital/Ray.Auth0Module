@@ -131,8 +131,12 @@ flowchart LR
 - [x] 5-1. CI が PHP 8.2 / 8.3 / 8.4 で通ることを確認します。
   - 2026-11-16: push 前の事前確認として、手元（8.2.30）と Docker（8.3.36 / 8.4.27）で CI と同じチェックを実行し、すべて通りました（phpunit 24 件成功、phpstan・phpcs エラーなし、php-cs-fixer 指摘 0 件、auth0/auth0-php 9.6.0）。
   - 2026-11-16: push 後の GitHub Actions（`374d7ba`、run 43792834856）で、8.2 / 8.3 / 8.4 のジョブがすべて成功しました。
-- [ ] 5-2. 実テナントに対して、Management API を 1 回以上呼び出します（例: `users->list()`）。
-- [ ] 5-3. 実テナントで、アクセストークンの検証（`Auth::verifyToken()`）が通ることを確認します。
+- [x] 5-2. 実テナントに対して、Management API を 1 回以上呼び出します（例: `users->list()`）。
+  - 2026-11-19: ステージングテナント（`stage-admin-webuomo.jp.auth0.com`）で、モジュール経由で `users->list()` が成功しました（PHP 8.2.30、auth0/auth0-php 9.6.0）。`Management` が SINGLETON であることも確認しました。
+  - 注意: `includeTotals` を指定しないと、ユーザーが 59 人いても 0 件になります。API は配列だけを返しますが、SDK は `{"users": [...]}` の形を前提に読み取るためです（SDK の挙動で、モジュールの不具合ではありません）。`includeTotals => true` を指定すると正しく取得できました。→ README の移行手順に注意書きを追加しました。
+- [x] 5-3. 実テナントで、アクセストークンの検証（`Auth::verifyToken()`）が通ることを確認します。
+  - 2026-11-19: 同じテナントで `verifyToken()` が成功しました（JWKS の取得、署名、`iss`、`aud`、有効期限）。`aud` が合わないトークンは `InvalidToken` で拒否されることも確認しました。
+  - 制約: 検証したのは Management API 向けのトークンです（`audience` も `https://stage-admin-webuomo.jp.auth0.com/api/v2/` に設定しました）。媒体の API（`https://admin.webuomo.jp/`）向けのトークンでは確認していません。
 - [ ] 5-4. 利用側の 1 媒体で、`composer require ray/auth0-module:dev-<ブランチ>` による組み込みを試します。
   - インラインエイリアス（`dev-xxx as 6.0.0`）を使う場合は、`composer depends ray/auth0-module` で逆依存を調べ、制約違反になるパッケージをタスクに明記します。
 
