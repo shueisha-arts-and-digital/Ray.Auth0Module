@@ -123,6 +123,22 @@ Management API のクライアントが SDK 側で作り直されたため、利
 | エラー時の例外 | 利用側で独自に投げる | `Auth0ApiException`（API のエラー応答）、`Auth0Exception`（SDK・通信のエラー） |
 | ページネーション | `page` / `per_page` を指定して手動でループ | `Pager` が自動でページを送ります |
 
+> [!WARNING]
+> `users->list()` などの一覧取得では、`includeTotals` に `true` を指定してください。
+> 指定しないと、Auth0 API はユーザーの配列だけを返します。
+> 一方、SDK は `{"users": [...]}` の形の応答を前提に読み取るため、例外にならずに **0 件** として扱われます（auth0-php 9.6.0 で確認しました）。
+>
+> ```php
+> use Auth0\SDK\API\Management\Users\Requests\ListUsersRequestParameters;
+>
+> foreach ($this->management->users->list(new ListUsersRequestParameters([
+>     'includeTotals' => true,
+>     'perPage' => 50,
+> ])) as $user) {
+>     // ...
+> }
+> ```
+
 ### 3. Management が読まなくなった config キーを確認します
 
 Management が読むのは `domain` / `clientId` / `clientSecret` / `tokenCache` だけになりました。
